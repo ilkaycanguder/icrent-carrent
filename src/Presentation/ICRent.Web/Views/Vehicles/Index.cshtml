@@ -1,0 +1,183 @@
+﻿@model List<Vehicle>
+@{
+    ViewData["Title"] = "Araçlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* ====== Vehicles (page-scoped) ====== */
+    .vehicles-scope {
+        --veh-accent: var(--neon, #0ef29b);
+        --veh-accent-2: #0bcf86;
+        --veh-border: rgba(14,242,155,.25);
+        --veh-row: #ffffff;
+        --veh-row-alt: #fbfffd;
+        --veh-hover: rgba(14,242,155,.08);
+          --veh-hover-strong: #edfff7; /* çok açık, nane yeşili */
+
+    }
+
+        .vehicles-scope .veh-card {
+            border-radius: 16px;
+            background: #fff;
+            overflow: hidden;
+            border: 1px solid var(--veh-border);
+            box-shadow: 0 10px 28px rgba(14,242,155,.10), 0 4px 12px rgba(0,0,0,.04);
+        }
+
+        .vehicles-scope .veh-cap {
+            height: 18px;
+            background: linear-gradient(180deg, var(--veh-accent), var(--veh-accent-2));
+        }
+
+        /* tablo */
+        .vehicles-scope .veh-table {
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+            .vehicles-scope .veh-table thead th {
+                background: linear-gradient(180deg, var(--veh-accent), var(--veh-accent-2));
+                color: #fff;
+                font-weight: 700;
+                border: 0 !important;
+                vertical-align: middle;
+                padding: 14px 18px;
+            }
+
+            .vehicles-scope .veh-table tbody td {
+                padding: 14px 18px;
+                border-top: 1px solid rgba(0,0,0,.04);
+            }
+
+            .vehicles-scope .veh-table tbody tr:nth-child(odd) {
+                background: var(--veh-row);
+            }
+
+            .vehicles-scope .veh-table tbody tr:nth-child(even) {
+                background: var(--veh-row-alt);
+            }
+
+            .vehicles-scope .veh-table tbody tr:hover {
+                background: var(--veh-hover);
+            }
+
+        /* hizalama ve butonlar */
+        .vehicles-scope .td-num {
+            text-align: right;
+        }
+
+        .vehicles-scope .veh-actions .btn {
+            min-width: 84px;
+        }
+
+    /* küçük ekran iyileştirme */
+    @@media (max-width: 576px) {
+        .vehicles-scope .veh-table thead th, .vehicles-scope .veh-table tbody td
+
+    {
+        padding: 12px 14px;
+    }
+
+    }
+</style>
+
+<div class="container mt-4 vehicles-scope">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4 class="mb-0">Araçlar</h4>
+        <a asp-action="Create" class="btn btn-neon btn-sm">Yeni Araç</a>
+    </div>
+
+    <!-- Kart -->
+    <div class="veh-card">
+        <div class="veh-cap"></div>
+        <div class="table-responsive">
+            <table class="table veh-table">
+                <thead>
+                    <tr>
+                        <th style="width:72px">#</th>
+                        <th>Ad</th>
+                        <th>Plaka</th>
+                        <th>Oluşturan</th>
+                        <th class="td-num">Oluşturulma Tarihi</th>
+                        <th>Güncelleyen Kişi</th>
+                        <th class="td-num">Güncellenme Tarihi</th>
+                        <th style="width:220px">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model)
+                    {
+                        <tr>
+                            <td>@v.Id</td>
+                            <td>@v.Name</td>
+                            <td>@v.Plate</td>
+                            <td>@v.CreatedByName</td>
+                            <td class="td-num">@v.CreatedAt.ToString("dd.MM.yyyy")</td>
+                            <td>@v.UpdatedByName</td>
+                            <td class="td-num">@(v.UpdatedAt.HasValue? v.UpdatedAt.Value.ToString("dd.MM.yyyy") : "-")</td>
+                            <td class="veh-actions">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a asp-action="Edit" asp-route-id="@v.Id" class="btn btn-outline-primary btn-sm">Güncelle</a>
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal"
+                                            data-id="@v.Id"
+                                            data-title="@v.Name (@v.Plate)">
+                                        Sil
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<form id="deleteForm" asp-action="DeleteConfirmed" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteId" />
+</form>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true" aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="deleteModalLabel">Silme Onayı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteText" class="mb-0"></p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Evet, Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const modalEl = document.getElementById('deleteModal');
+          const idInput = document.getElementById('deleteId');
+          const textEl  = document.getElementById('deleteText');
+          const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+          modalEl.addEventListener('show.bs.modal', function (event) {
+            const btn = event.relatedTarget;
+            idInput.value = btn.getAttribute('data-id');
+            textEl.textContent = `"${btn.getAttribute('data-title')}" kaydını silmek istediğinize emin misiniz?`;
+          });
+
+          confirmBtn.addEventListener('click', function(){
+            document.getElementById('deleteForm').submit();
+          });
+        });
+    </script>
+}

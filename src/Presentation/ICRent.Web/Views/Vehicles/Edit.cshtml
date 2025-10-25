@@ -1,0 +1,39 @@
+﻿@model Vehicle
+
+<h4 class="mb-3">Araç Düzenle</h4>
+
+@if (TempData["Info"] != null)
+{
+    <div class="alert alert-info">@TempData["Info"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<!-- ModelState özet -->
+<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Name">Araç Adı</label>
+        <input class="form-control" asp-for="Name" required />
+        <span class="text-danger" asp-validation-for="Name"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Plate">Plaka</label>
+        <input class="form-control" asp-for="Plate" required />
+        <span class="text-danger" asp-validation-for="Plate"></span>
+    </div>
+
+    <button class="btn btn-neon">Kaydet</button>
+    <a asp-action="Index" class="btn neon-outline ms-2">İptal</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

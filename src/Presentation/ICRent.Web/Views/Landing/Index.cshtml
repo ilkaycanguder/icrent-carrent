@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "Hoş Geldiniz";
+    Layout = "~/Views/Shared/_PublicLayout.cshtml";
+}
+<section class="hero container d-flex flex-column align-items-center justify-content-center text-center">
+    <h1 class="hero-title">ICRent</h1>
+    <p class="hero-subtitle">
+        Araç çalışma & bakım sürelerini kolayca takip et. Basit, hızlı, güvenilir.
+    </p>
+    <div class="mt-3 d-flex gap-2 flex-wrap justify-content-center">
+        <a class="btn btn-primary btn-lg px-4" asp-controller="Account" asp-action="Login" aria-label="Giriş Yap">
+            Giriş Yap
+        </a>
+        <a class="btn btn-outline-primary btn-lg px-4" asp-controller="Account" asp-action="Register" aria-label="Kayıt Ol">
+            Kayıt Ol
+        </a>
+    </div>
+
+    <div class="hero-stats row g-3 mt-5 w-100">
+        <div class="col-12 col-md-4">
+            <div class="stat-card shadow-sm">
+                <div class="stat-value">7×24</div>
+                <div class="stat-label">Çalışma Modeli</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="stat-card shadow-sm">
+                <div class="stat-value">%100</div>
+                <div class="stat-label">Responsive Tasarım</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="stat-card shadow-sm">
+                <div class="stat-value">ADO.NET</div>
+                <div class="stat-label">Temiz Mimari</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container features py-5">
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+            <div class="feature-card h-100 p-4 shadow-sm">
+                <div class="feature-emoji">🚗</div>
+                <h3 class="feature-title">Araç Yönetimi</h3>
+                <p class="mb-0">Araçları ekle, düzenle; plakaya göre anında eriş.</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="feature-card h-100 p-4 shadow-sm">
+                <div class="feature-emoji">⏱️</div>
+                <h3 class="feature-title">Günlük Giriş</h3>
+                <p class="mb-0">Aktif & bakım saatlerini kolayca gir; kalan süreyi anında gör.</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="feature-card h-100 p-4 shadow-sm">
+                <div class="feature-emoji">📊</div>
+                <h3 class="feature-title">Haftalık Analiz</h3>
+                <p class="mb-0">Aktif/boşta yüzdelerini grafiklerle karşılaştır.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // ufak bir fade-in efekti
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".feature-card, .stat-card").forEach(function (el, i) {
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    el.style.transition = "opacity .5s ease";
+                    el.style.opacity = 1;
+                }, 150 + i * 120);
+            });
+        });
+    </script>
+}

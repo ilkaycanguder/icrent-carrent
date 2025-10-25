@@ -1,0 +1,335 @@
+﻿@{
+    ViewData["Title"] = "Günlük Çalışma Kaydı";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var vehicles = (ViewBag.Vehicles as List<Vehicle>) ?? new();
+}
+
+<style>
+    /* ===== WorkLog – Neon Green Scope ===== */
+    .worklog-scope {
+        --neon: #0ef29b;
+        --neon-2: #7dfcc4;
+        --ink: #212529;
+        --muted: #6c757d;
+        --card: #ffffff;
+        --edge: rgba(14,242,155,.22);
+        --glow-soft: 0 10px 24px rgba(14,242,155,.18);
+        --ring: 0 0 0 .25rem rgba(14,242,155,.25);
+    }
+
+        /* Card */
+        .worklog-scope .wl-card {
+            border: 1px solid var(--edge);
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: var(--glow-soft), 0 3px 12px rgba(0,0,0,.05);
+            overflow: hidden;
+        }
+
+        .worklog-scope .wl-cap {
+            height: 16px;
+            background: linear-gradient(180deg, var(--neon), var(--neon-2));
+        }
+
+        /* Head */
+        .worklog-scope .wl-title {
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .worklog-scope .wl-sub {
+            color: var(--muted);
+        }
+
+        /* Inputs */
+        .worklog-scope .form-control,
+        .worklog-scope .form-select {
+            border-radius: 12px;
+            border-color: rgba(0,0,0,.08);
+        }
+
+            .worklog-scope .form-control:focus,
+            .worklog-scope .form-select:focus {
+                box-shadow: var(--ring);
+                border-color: var(--neon);
+            }
+
+        /* +/- & outline buttons */
+        .worklog-scope .btn-neon-outline {
+            border: 2px solid var(--neon);
+            color: var(--ink);
+            background: transparent;
+            border-radius: 12px;
+        }
+
+            .worklog-scope .btn-neon-outline:hover {
+                background: rgba(14,242,155,.12);
+                box-shadow: var(--glow-soft);
+            }
+
+        .worklog-scope .btn-neon {
+            border: 0;
+            border-radius: 14px;
+            background-image: linear-gradient(90deg, var(--neon), var(--neon-2));
+            color: #0c5132;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(14,242,155,.35);
+        }
+
+            .worklog-scope .btn-neon:hover {
+                filter: brightness(.98);
+                box-shadow: 0 10px 28px rgba(14,242,155,.35);
+            }
+
+        /* Quick chips */
+        .worklog-scope .chip {
+            border: 1px solid var(--edge);
+            background: #fff;
+            border-radius: 999px;
+            padding: .35rem .7rem;
+            font-weight: 600;
+        }
+
+            .worklog-scope .chip:hover {
+                border-color: var(--neon);
+                box-shadow: var(--glow-soft);
+            }
+
+        /* Neon progress (2 katman) */
+        .worklog-scope .neon-progress {
+            position: relative;
+            height: 16px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #f3f7f5, #eef8f3);
+            box-shadow: inset 0 0 0 1px rgba(14,242,155,.25);
+            overflow: hidden;
+        }
+
+        .worklog-scope .np-active,
+        .worklog-scope .np-maint {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+        }
+
+        .worklog-scope .np-active {
+            background: linear-gradient(90deg, var(--neon), var(--neon-2));
+            box-shadow: inset 0 -8px 18px rgba(0,0,0,.06);
+        }
+
+        .worklog-scope .np-maint {
+            background: linear-gradient(90deg, #ffe08a, #ffd24d);
+            mix-blend-mode: multiply;
+        }
+
+        /* Tiny text */
+        .worklog-scope .muted {
+            color: var(--muted);
+        }
+
+        /* Input-group buttons */
+        .worklog-scope .input-group .btn {
+            border-radius: 12px;
+        }
+</style>
+
+<div class="row justify-content-center worklog-scope">
+    <div class="col-12 col-lg-10">
+        <div class="wl-card mb-4">
+            <div class="wl-cap"></div>
+            <div class="card-body p-4 p-md-5">
+
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+                    <div>
+                        <h4 class="wl-title mb-1">Günlük Çalışma / Bakım Girişi</h4>
+                        <small class="wl-sub">Bir gün ≤ 24 saat: <em>Boşta = 24 − (Aktif + Bakım)</em></small>
+                    </div>
+                    <a class="btn btn-neon-outline btn-sm" asp-controller="WorkLogs" asp-action="Index" asp-route-vehicleId="0">
+                        Son Kayıtlarım
+                    </a>
+                </div>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success mb-4">@TempData["Success"]</div>
+                }
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <form asp-action="Create" asp-controller="WorkLogs" method="post" class="row g-3">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Araç -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold">Araç</label>
+                        <select name="VehicleId" class="form-select" required>
+                            <option value="">— Seçiniz —</option>
+                            @foreach (var v in vehicles)
+                            {
+                                <option value="@v.Id">@v.Name (@v.Plate)</option>
+                            }
+                        </select>
+                        <small class="muted">Listeden aracı seçin.</small>
+                    </div>
+
+                    <!-- Tarih -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold">Tarih</label>
+                        <input type="date" name="workDate" class="form-control"
+                               value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                        <small class="muted">Girdiğiniz gün için kayıt oluşturulur/güncellenir.</small>
+                    </div>
+
+                    <!-- Aktif Saat -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label d-flex justify-content-between fw-semibold">
+                            <span>Aktif Saat</span>
+                            <span class="muted small"><span id="activeVal">0</span> saat</span>
+                        </label>
+
+                        <div class="input-group">
+                            <button class="btn btn-neon-outline inc" data-target="activeHours" data-step="-0.25" type="button">−</button>
+                            <input type="number" name="activeHours" class="form-control text-end" step="0.25" min="0" max="24" value="0" required />
+                            <button class="btn btn-neon-outline inc" data-target="activeHours" data-step="0.25" type="button">+</button>
+                        </div>
+
+                        <div class="mt-2 d-flex flex-wrap gap-2">
+                            <button type="button" class="chip quick" data-target="activeHours" data-val="0">0</button>
+                            <button type="button" class="chip quick" data-target="activeHours" data-val="4">4</button>
+                            <button type="button" class="chip quick" data-target="activeHours" data-val="8">8</button>
+                            <button type="button" class="chip quick" data-target="activeHours" data-val="12">12</button>
+                        </div>
+                    </div>
+
+                    <!-- Bakım Saat -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label d-flex justify-content-between fw-semibold">
+                            <span>Bakım Saat</span>
+                            <span class="muted small"><span id="maintVal">0</span> saat</span>
+                        </label>
+
+                        <div class="input-group">
+                            <button class="btn btn-neon-outline inc" data-target="maintenanceHours" data-step="-0.25" type="button">−</button>
+                            <input type="number" name="maintenanceHours" class="form-control text-end" step="0.25" min="0" max="24" value="0" required />
+                            <button class="btn btn-neon-outline inc" data-target="maintenanceHours" data-step="0.25" type="button">+</button>
+                        </div>
+
+                        <div class="mt-2 d-flex flex-wrap gap-2">
+                            <button type="button" class="chip quick" data-target="maintenanceHours" data-val="0">0</button>
+                            <button type="button" class="chip quick" data-target="maintenanceHours" data-val="1">1</button>
+                            <button type="button" class="chip quick" data-target="maintenanceHours" data-val="2">2</button>
+                            <button type="button" class="chip quick" data-target="maintenanceHours" data-val="4">4</button>
+                        </div>
+                    </div>
+
+                    <!-- Özet / İlerleme -->
+                    <div class="col-12">
+                        <div class="p-3 p-md-4 rounded-4" style="background:linear-gradient(180deg,#f9fffb,#f5fff9)">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Gün Özeti</strong>
+                                <small class="muted">Toplam ≤ 24 saat</small>
+                            </div>
+
+                            <div class="neon-progress" aria-label="Günlük toplam">
+                                <div class="np-active" id="npActive" style="width:0%"></div>
+                                <div class="np-maint" id="npMaint" style="width:0%"></div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-3 mt-2 small muted">
+                                <span>Aktif: <strong id="activeOut">0.00</strong> sa</span>
+                                <span>Bakım: <strong id="maintOut">0.00</strong> sa</span>
+                                <span>Boşta: <strong id="idleDay">24.00</strong> sa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Butonlar -->
+                    <div class="col-12 d-flex gap-2">
+                        <button class="btn btn-neon">
+                            <i class="bi bi-check2-circle me-1"></i> Kaydet
+                        </button>
+                        <button class="btn btn-neon-outline no-transition" type="reset" id="btnReset">
+                            Temizle
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        (function () {
+          const $a = $("input[name='activeHours']");
+          const $m = $("input[name='maintenanceHours']");
+          const clamp = (v,min,max)=>Math.min(max,Math.max(min,v));
+
+          function recalc() {
+            const a = parseFloat($a.val()) || 0;
+            const m = parseFloat($m.val()) || 0;
+            const total = a + m;
+            const idle = clamp(24 - total, 0, 24);
+
+            $("#activeVal").text(a);
+            $("#maintVal").text(m);
+            $("#activeOut").text(a.toFixed(2));
+            $("#maintOut").text(m.toFixed(2));
+            $("#idleDay").text(idle.toFixed(2));
+
+            const aPct = clamp((a / 24) * 100, 0, 100);
+            const mPct = clamp((m / 24) * 100, 0, 100);
+
+            // neon progress yüzdeleri
+            document.getElementById("npActive").style.width = aPct + "%";
+            document.getElementById("npMaint").style.left  = aPct + "%";
+            document.getElementById("npMaint").style.width = mPct + "%";
+          }
+
+          // + / - butonları
+          $(".inc").on("click", function(){
+            const target = $(this).data("target");
+            const step = parseFloat($(this).data("step")) || 0;
+            const $inp = $(`input[name='${target}']`);
+            let v = parseFloat($inp.val()) || 0;
+            v = clamp((v + step), 0, 24);
+            // .00 tut
+            $inp.val(v.toFixed(2)).trigger("input");
+          });
+
+          // quick set butonları
+          $(".quick").on("click", function(){
+            const target = $(this).data("target");
+            const val = parseFloat($(this).data("val")) || 0;
+            const $inp = $(`input[name='${target}']`);
+            $inp.val(clamp(val,0,24)).trigger("input");
+          });
+
+          // input değişince
+          $a.add($m).on("input", function () {
+            let a = parseFloat($a.val()) || 0;
+            let m = parseFloat($m.val()) || 0;
+            if (a < 0 || m < 0) { return; }
+            if (a + m > 24) {
+              const over = (a + m) - 24;
+              if (this.name === "activeHours") { a = a - over; $a.val(clamp(a,0,24).toFixed(2)); }
+              else { m = m - over; $m.val(clamp(m,0,24).toFixed(2)); }
+            }
+            recalc();
+          });
+
+          // submit kontrolü
+          $("form").on("submit", function () {
+            const a = parseFloat($a.val()) || 0;
+            const m = parseFloat($m.val()) || 0;
+            if (a < 0 || m < 0) { alert("Saatler negatif olamaz."); return false; }
+            if (a + m > 24) { alert("Bir gün için toplam (aktif + bakım) 24 saati geçemez."); return false; }
+          });
+
+          $("#btnReset").on("click", function(){ setTimeout(recalc, 0); });
+
+          recalc();
+        })();
+    </script>
+}

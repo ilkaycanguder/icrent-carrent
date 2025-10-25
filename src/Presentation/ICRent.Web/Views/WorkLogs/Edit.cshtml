@@ -1,0 +1,30 @@
+﻿@model WorkLog
+@{
+    Layout = "_Layout";
+}
+<h4>Düzenle – @Model.WorkDate</h4>
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+    <div class="row g-2">
+        <div class="col-sm-3">
+            <label class="form-label">Aktif Saat</label>
+            <input name="activeHours" type="number" step="0.25" min="0" max="24"
+                   value="@(ViewBag.PostActive ?? Model.ActiveHours)"
+                   class="form-control" required />
+        </div>
+        <div class="col-sm-3">
+            <label class="form-label">Bakım Saat</label>
+            <input name="maintenanceHours" type="number" step="0.25" min="0" max="24"
+                   value="@(ViewBag.PostMaint ?? Model.MaintenanceHours)"
+                   class="form-control" required />
+        </div>
+        <div class="col-12 mt-2">
+            <button class="btn btn-primary">Kaydet</button>
+            <a class="btn btn-secondary" asp-action="Index" asp-route-vehicleId="@Model.VehicleId">Geri</a>
+        </div>
+    </div>
+</form>

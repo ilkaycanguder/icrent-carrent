@@ -1,0 +1,32 @@
+﻿body {
+}
+<style >
+:root {
+    --neon: #0ef29b;
+    --neon-2: #7dfcc4;
+    --neon-shadow: 0 0 6px rgba(14,242,155,.75), 0 0 18px rgba(14,242,155,.35);
+    --neon-shadow-strong: 0 0 10px rgba(14,242,155,.9), 0 0 30px rgba(14,242,155,.6);
+}
+
+.btn-neon {
+    background: linear-gradient(90deg, var(--neon), var(--neon-2));
+    color: #05341f;
+    font-weight: 700;
+    letter-spacing: .2px;
+    border: 1px solid rgba(14,242,155,.65);
+    box-shadow: var(--neon-shadow);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+    .btn-neon:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--neon-shadow-strong);
+        color: #032317;
+    }
+
+    .btn-neon:active {
+        transform: none;
+        filter: brightness(.98);
+    }
+
+</style >

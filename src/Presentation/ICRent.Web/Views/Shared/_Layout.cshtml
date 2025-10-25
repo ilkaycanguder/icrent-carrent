@@ -1,0 +1,180 @@
+﻿@{
+    Layout = null;
+    var title = ViewData["Title"] ?? "ICRent";
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - ICRent</title>
+
+    <!-- Aynı kütüphaneler + ikon + neon css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/css/layout-theme.css" rel="stylesheet" />
+    <link href="~/css/publiclayout.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- NEON NAVBAR (PublicLayout ile aynı tasarım) -->
+    <nav class="navbar navbar-expand-lg public-nav fixed-top">
+        <div class="container">
+            <a class="navbar-brand neon-brand" asp-controller="Landing" asp-action="Index">
+                <i class="bi bi-lightning-charge-fill me-1"></i> ICRent
+            </a>
+
+            <button class="navbar-toggler neon-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#nav"
+                    aria-controls="nav" aria-expanded="false" aria-label="Menüyü Aç/Kapat">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="nav">
+                <!-- Sol Menü (rol bazlı) -->
+                <ul class="navbar-nav me-auto align-items-lg-center">
+
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link neon-link" asp-controller="Vehicles" asp-action="Index">
+                                    Araçlar <span class="neon-underline"></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link neon-link" asp-controller="Reports" asp-action="WeeklyReport">
+                                    Haftalık % <span class="neon-underline"></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link neon-link" asp-controller="Reports" asp-action="Gantt">
+                                    Gantt <span class="neon-underline"></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link neon-link" asp-controller="Reports" asp-action="Audit">
+                                    İşlem İzleme <span class="neon-underline"></span>
+                                </a>
+                            </li>
+                        }
+                        else if (User.IsInRole("User"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link neon-link" asp-controller="WorkLogs" asp-action="Create">
+                                    Günlük Giriş <span class="neon-underline"></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link neon-link"
+                                   asp-controller="WorkLogs" asp-action="Index"
+                                   asp-route-vehicleId="@(ViewBag.VehicleId ?? 0)">
+                                    Kayıtlarım <span class="neon-underline"></span>
+                                </a>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link neon-link" asp-controller="Landing" asp-action="Index">
+                                Ana Sayfa <span class="neon-underline"></span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+                <!-- Sağ Menü (kullanıcı alanı) -->
+                <ul class="navbar-nav align-items-lg-center">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li class="nav-item d-flex align-items-center me-lg-2">
+                            <span class="navbar-text fw-semibold">Hoşgeldin, @User.Identity!.Name</span>
+                        </li>
+                        <li class="nav-item d-flex align-items-center me-lg-2">
+                            <a class="nav-link neon-link" asp-controller="Account" asp-action="EditProfile">
+                                Profili Güncelle <span class="neon-underline"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-sm neon-outline" data-bs-toggle="modal" data-bs-target="#logoutModal">Çıkış</button>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item me-lg-2 mt-2 mt-lg-0">
+                            <a class="btn btn-sm neon-outline" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                        </li>
+                        <li class="nav-item mt-2 mt-lg-0">
+                            <a class="btn btn-sm neon-btn" asp-controller="Account" asp-action="Register">
+                                <i class="bi bi-person-plus me-1"></i> Kayıt Ol
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <!-- neon alt-ışık -->
+        <div class="neon-nav-glow"></div>
+    </nav>
+
+    <!-- İçerik -->
+    <main class="container content-wrapper">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center">
+        <small>&copy; @DateTime.Now.Year — ICRent Araç Takip ve Kiralama Sistemi</small>
+    </footer>
+
+    <!-- Scriptler -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+    <script>
+        // Onayla: önce server logout, ardından Landing/Index'e yönlendir
+        (function(){
+          const btn = document.getElementById('confirmLogout');
+          if(!btn) return;
+          btn.addEventListener('click', function () {
+            // 1) Eğer Logout Action'ınız GET ise:
+            window.location.href = '@Url.Action("Logout", "Account")?returnUrl=@Url.Action("Index", "Landing")';
+
+            // 2) Eğer Logout POST ise ve anti-forgery istiyorsanız, yorumdan çıkarın:
+            // const f = document.createElement('form');
+            // f.method = 'POST';
+            // f.action = '@Url.Action("Logout", "Account")';
+            // f.innerHTML = '@Html.AntiForgeryToken()';
+            // document.body.appendChild(f); f.submit();
+          });
+        })();
+    </script>
+    <!-- Logout Modal (Neon Theme) -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content neon-modal">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" id="logoutModalLabel">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Çıkış
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <p class="mb-0">Çıkış yapmak istediğinizden emin misiniz?</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-sm neon-outline" data-bs-dismiss="modal">Vazgeç</button>
+                    <a href="@Url.Action("Logout", "Account")" class="btn btn-sm neon-btn">Evet, Çıkış Yap</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

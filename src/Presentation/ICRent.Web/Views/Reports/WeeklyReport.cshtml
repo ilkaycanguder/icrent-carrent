@@ -1,0 +1,298 @@
+﻿@using ICRent.Domain.Entities
+@{
+    ViewData["Title"] = "Haftalık Rapor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    :root {
+        --neon: #0ef29b;
+        --neon-2: #7dfcc4;
+        --neon-shadow: 0 0 6px rgba(14,242,155,.75),0 0 18px rgba(14,242,155,.35);
+        --neon-shadow-strong: 0 0 12px rgba(14,242,155,.95),0 0 30px rgba(14,242,155,.55);
+    }
+
+    /* Sayfa kapsamı */
+    .report-scope .card {
+        border: 1px solid rgba(14,242,155,.30);
+        border-radius: 16px;
+        box-shadow: 0 14px 28px rgba(14,242,155,.10),0 6px 14px rgba(0,0,0,.05);
+    }
+
+    .report-scope .card-body {
+        position: relative;
+    }
+
+        .report-scope .card-body h6 {
+            font-weight: 800;
+            letter-spacing: .2px;
+            color: #0b7f55;
+        }
+
+    /* Başlık rozeti */
+    .report-badge {
+        display: inline-block;
+        padding: .35rem .75rem;
+        border-radius: 999px;
+        font-size: .85rem;
+        font-weight: 700;
+        color: #0b7f55;
+        background: linear-gradient(90deg,rgba(14,242,155,.18),rgba(14,242,155,.08));
+        border: 1px solid rgba(14,242,155,.35);
+        box-shadow: var(--neon-shadow);
+    }
+
+    /* Tablo */
+    .report-scope table thead th {
+        background: linear-gradient(180deg, rgba(14,242,155,.18), rgba(14,242,155,.08));
+        color: #0b7f55;
+        border-bottom: 1px solid rgba(14,242,155,.35) !important;
+        font-weight: 800;
+    }
+
+    .report-scope table tbody tr:hover {
+        background: rgba(14,242,155,.08);
+    }
+
+    .report-scope table td,
+    .report-scope table th {
+        vertical-align: middle;
+    }
+
+    /* Canvas çevresine hafif ışıma */
+    .report-scope canvas {
+        border-radius: 12px;
+        background: radial-gradient(120% 60% at 100% -20%, rgba(14,242,155,.10), transparent 60%), radial-gradient(100% 50% at -10% 120%, rgba(14,242,155,.08), transparent 60%), #fff;
+        box-shadow: inset 0 0 0 1px rgba(14,242,155,.15);
+    }
+
+    /* Küçük ekran */
+    @@media (max-width:576px) {
+        .report-scope .card
+
+    {
+        border-radius: 14px;
+    }
+
+    }
+</style>
+
+<div class="container py-3 report-scope">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <span class="report-badge">Haftalık Rapor</span>
+            <h3 class="mb-0 mt-2 fw-bold">Haftalık Aktif / Boşta Yüzdeleri</h3>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-2">Aktif %</h6>
+                    <canvas id="chartActive" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-2">Boşta %</h6>
+                    <canvas id="chartIdle" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body table-responsive">
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>Araç</th>
+                        <th>Aktif (saat)</th>
+                        <th>Bakım (saat)</th>
+                        <th>Boşta (saat)</th>
+                        <th>Aktif %</th>
+                        <th>Boşta %</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+    <script>
+        (async () => {
+          const res = await fetch('@Url.Action("WeeklyReportData", "Reports")', { method: 'POST' });
+          const rows = await res.json();
+
+          // tablo
+          const tb = document.getElementById('tbody');
+          tb.innerHTML = rows.map(r => `
+            <tr>
+              <td>${r.name} (${r.plate})</td>
+              <td>${r.active.toFixed(2)}</td>
+              <td>${r.maintenance.toFixed(2)}</td>
+              <td>${r.idle.toFixed(2)}</td>
+              <td>${r.activePct.toFixed(1)}%</td>
+              <td>${r.idlePct.toFixed(1)}%</td>
+            </tr>
+          `).join('');
+
+          // grafikler
+          const labels   = rows.map(r => `${r.name} (${r.plate})`);
+          const aktifPct = rows.map(r => r.activePct);
+          const bosPct   = rows.map(r => r.idlePct);
+
+          new Chart(document.getElementById('chartActive'), {
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Aktif %', data: aktifPct }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+          });
+
+          new Chart(document.getElementById('chartIdle'), {
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Boşta %', data: bosPct }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+          });
+        })();
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+<script>
+(async () => {
+  const res = await fetch('@Url.Action("WeeklyReportData", "Reports")', { method: 'POST' });
+  const rows = await res.json();
+
+  // Tablo
+  const tb = document.getElementById('tbody');
+  tb.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.name} (${r.plate})</td>
+      <td>${r.active.toFixed(2)}</td>
+      <td>${r.maintenance.toFixed(2)}</td>
+      <td>${r.idle.toFixed(2)}</td>
+      <td>${r.activePct.toFixed(1)}%</td>
+      <td>${r.idlePct.toFixed(1)}%</td>
+    </tr>
+  `).join('');
+
+  // Grafik verileri
+  const labels   = rows.map(r => `${r.name} (${r.plate})`);
+  const aktifPct = rows.map(r => r.activePct);
+  const bosPct   = rows.map(r => r.idlePct);
+
+  // Ortak Chart.js tema ayarları (neon)
+  Chart.defaults.font.family = "'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+  const gridColor  = 'rgba(14,242,155,.25)';
+  const tickColor  = '#0b7f55';
+  const legendColor= '#0b7f55';
+  const tooltipBg  = 'rgba(14,242,155,.15)';
+
+  // Gradient yardımcı
+  function makeGradient(ctx){
+    const g = ctx.createLinearGradient(0, 0, 0, 240);
+    g.addColorStop(0, 'rgba(14,242,155,.85)');
+    g.addColorStop(1, 'rgba(14,242,155,.25)');
+    return g;
+  }
+
+  // Aktif %
+  const ctxA = document.getElementById('chartActive').getContext('2d');
+  const gradA = makeGradient(ctxA);
+
+  new Chart(ctxA, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Aktif %',
+        data: aktifPct,
+        backgroundColor: gradA,
+        borderColor: 'rgba(14,242,155,.95)',
+        borderWidth: 1,
+        borderRadius: 8,
+        hoverBackgroundColor: 'rgba(14,242,155,.95)',
+        hoverBorderColor: 'rgba(14,242,155,1)'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: legendColor, font: { weight: '700'} } },
+        tooltip: {
+          backgroundColor: tooltipBg,
+          titleColor: '#0b7f55',
+          bodyColor: '#0b7f55',
+          borderColor: 'rgba(14,242,155,.35)',
+          borderWidth: 1,
+          callbacks: {
+            label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: tickColor },
+          grid: { color: gridColor, drawOnChartArea: false }
+        },
+        y: {
+          beginAtZero: true, max: 100,
+          ticks: { color: tickColor, callback: v => v + '%' },
+          grid: { color: gridColor }
+        }
+      }
+    }
+  });
+
+  // Boşta %
+  const ctxI = document.getElementById('chartIdle').getContext('2d');
+  const gradI = makeGradient(ctxI);
+
+  new Chart(ctxI, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Boşta %',
+        data: bosPct,
+        backgroundColor: gradI,
+        borderColor: 'rgba(14,242,155,.95)',
+        borderWidth: 1,
+        borderRadius: 8,
+        hoverBackgroundColor: 'rgba(14,242,155,.95)',
+        hoverBorderColor: 'rgba(14,242,155,1)'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: legendColor, font: { weight: '700'} } },
+        tooltip: {
+          backgroundColor: tooltipBg,
+          titleColor: '#0b7f55',
+          bodyColor: '#0b7f55',
+          borderColor: 'rgba(14,242,155,.35)',
+          borderWidth: 1,
+          callbacks: {
+            label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: tickColor },
+          grid: { color: gridColor, drawOnChartArea: false }
+        },
+        y: {
+          beginAtZero: true, max: 100,
+          ticks: { color: tickColor, callback: v => v + '%' },
+          grid: { color: gridColor }
+        }
+      }
+    }
+  });
+})();
+</script>
+}
+

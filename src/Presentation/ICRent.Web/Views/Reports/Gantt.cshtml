@@ -1,0 +1,308 @@
+﻿@{
+    Layout = "_Layout";
+    var vehicles = ViewBag.Vehicles as IEnumerable<dynamic>;
+}
+
+<h4 class="mb-3">Haftalık Gantt</h4>
+
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <form id="filterForm" class="row g-3 align-items-end">
+            <div class="col-12 col-lg-5">
+                <label class="form-label fw-semibold mb-1">Araçlar (çoklu seçim)</label>
+                <div class="vehicle-select">
+                    <input type="text" id="vehicleSearch" class="form-control form-control-sm mb-2" placeholder="Araç ara (isim/plaka)..." aria-label="Araç ara">
+                    <select id="vehicleIds" name="vehicleIds" class="form-select" multiple size="8" aria-label="Araç listesi (çoklu seçim)">
+                        @foreach (var v in vehicles)
+                        {
+                            <option value="@v.Id">@v.Name (@v.Plate)</option>
+                        }
+                    </select>
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="button" id="selectAll" class="btn btn-neon btn-sm">Hepsini Seç</button>
+                        <button type="button" id="clearAll" class="btn neon-outline btn-sm">Temizle</button>
+                    </div>
+                    <small class="text-muted d-block mt-1">Ctrl / Cmd ile çoklu seçim yapabilirsiniz.</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <label class="form-label fw-semibold mb-1">Başlangıç</label>
+                <input type="date" id="start" name="start" class="form-control" value="@ViewBag.WeekStart" />
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <label class="form-label fw-semibold mb-1">Bitiş</label>
+                <input type="date" id="end" name="end" class="form-control" value="@ViewBag.WeekEnd" />
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <label class="form-label fw-semibold mb-1">Hızlı Aralık</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn neon-outline btn-sm" id="btnThisWeek">Bu Hafta</button>
+                    <button type="button" class="btn neon-outline btn-sm" id="btnLastWeek">Geçen Hafta</button>
+                    <button type="submit" class="btn btn-neon btn-sm ms-lg-auto flex-fill flex-lg-grow-0">Göster</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="legend small text-muted mb-2">
+    <span class="legend-dot legend-active"></span> Aktif çalışma
+    <span class="ms-3" id="taskCount"></span>
+</div>
+
+<div class="gantt-wrap">
+    <div id="gantt" class="gantt-host"></div>
+    <div id="ganttEmpty" class="gantt-empty text-center p-5 d-none">
+        <div class="mb-2">Bu aralıkta gösterilecek kayıt bulunamadı.</div>
+        <small class="text-muted">Filtreleri değiştirerek tekrar deneyin.</small>
+    </div>
+    <div id="ganttLoading" class="gantt-loading d-none">
+        <div class="spinner-border text-success" role="status" aria-label="Yükleniyor"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.css" rel="stylesheet" />
+
+    <script>
+        let gantt = null;
+
+        // --- yardımcılar ---
+        function setWeek(which) {
+          const today = new Date();
+          const day = today.getDay() || 7; // pazar=7
+          const monday = new Date(today);
+          monday.setDate(today.getDate() - day + 1 + (which === 'last' ? -7 : 0));
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+          const toISO = d => d.toISOString().slice(0,10);
+          document.getElementById('start').value = toISO(monday);
+          document.getElementById('end').value   = toISO(sunday);
+        }
+        const showLoading = s => document.getElementById('ganttLoading').classList.toggle('d-none', !s);
+        const showEmpty   = s => document.getElementById('ganttEmpty').classList.toggle('d-none', !s);
+
+        // --- sayfa yüklenince ---
+        document.addEventListener('DOMContentLoaded', function () {
+          const sel = document.getElementById('vehicleIds');
+          // Varsayılan: hepsini seç
+          for (const opt of sel.options) opt.selected = true;
+
+          // Ara kutusu: seçenekleri filtrele
+          document.getElementById('vehicleSearch').addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            for (const opt of sel.options) {
+              opt.hidden = q && !opt.text.toLowerCase().includes(q);
+            }
+          });
+
+          // Hepsini seç / temizle
+          document.getElementById('selectAll').addEventListener('click', () => { for (const o of sel.options) if (!o.hidden) o.selected = true; });
+          document.getElementById('clearAll').addEventListener('click',  () => { for (const o of sel.options) o.selected = false; });
+
+          // Hızlı aralık
+          document.getElementById('btnThisWeek').addEventListener('click', () => setWeek('this'));
+          document.getElementById('btnLastWeek').addEventListener('click', () => setWeek('last'));
+
+          // İlk yükleme
+          document.getElementById('filterForm').dispatchEvent(new Event('submit', { cancelable: true }));
+        });
+
+        // --- form submit ---
+        $("#filterForm").on("submit", function (e) {
+          e.preventDefault();
+
+          const selected = $("#vehicleIds").val() || [];
+          const s = $("#start").val();
+          const eDate = $("#end").val();
+
+          if (selected.length === 0) { alert("En az bir araç seçmelisiniz."); return; }
+          if (!s || !eDate) { alert("Başlangıç ve bitiş tarihi seçiniz."); return; }
+
+          showEmpty(false); showLoading(true);
+
+          $.ajax({
+            url: '@Url.Action("GanttData", "Reports")',
+            method: 'POST',
+            data: { vehicleIds: selected, start: s, end: eDate },
+            traditional: true,
+            success: function (rows) {
+              showLoading(false);
+
+              const host = document.getElementById("gantt");
+              host.innerHTML = "";
+              document.getElementById('taskCount').textContent = rows.length ? `• ${rows.length} kayıt` : '';
+
+              if (!rows.length) { showEmpty(true); return; }
+
+              const tasks = rows.map((r, i) => {
+                const st = new Date(r.start);
+                const en = new Date(r.end);
+                return {
+                  id: `T-${i}`,
+                  name: `${r.vehicle} • Aktif`,
+                  start: st.toISOString(),
+                  end:   en.toISOString(),
+                  progress: 100,
+                  custom_class: 'bar-active',
+                  details: {
+                    by: r.user,
+                    hours: ((en - st) / 3600000).toFixed(1),
+                    type: 'Aktif',
+                    date: r.start
+                  }
+                };
+              });
+
+              gantt = new Gantt("#gantt", tasks, {
+                view_mode: 'Day',
+                language: 'tr',
+                bar_height: 22,
+                padding: 26,
+                draggable: false,
+                custom_popup_html: (task) => {
+                  const d = task.details || {};
+                  const gun = new Date(d.date).toLocaleString('tr-TR');
+                  return `
+                    <div class="details-container">
+                      <div class="title">${task.name}</div>
+                      <div class="subtitle">${d.type} • ${d.hours} saat</div>
+                      <div class="meta">Gün: ${gun} • Girişi yapan: ${d.by}</div>
+                    </div>`;
+                }
+              });
+            },
+            error: function () {
+              showLoading(false);
+              alert("Veri alınamadı.");
+            }
+          });
+        });
+                document.querySelectorAll('#gantt .bar-wrapper').forEach(el => {
+          el.addEventListener('mousedown', e => e.stopImmediatePropagation(), true);
+          el.addEventListener('touchstart', e => e.stopImmediatePropagation(), true);
+        });
+
+
+    </script>
+
+    <style>
+        .btn.neon-outline {
+            border: 1.5px solid rgba(14,242,155,.55);
+            color: #0b7f55;
+            background: linear-gradient(180deg, rgba(14,242,155,.06), rgba(14,242,155,.0));
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(14,242,155,.10);
+        }
+
+            .btn.neon-outline:hover {
+                background: rgba(14,242,155,.14);
+                color: #095c3f;
+                transform: translateY(-1px);
+            }
+        /* Sticky filtre çubuğu (navbar yüksekliğine göre pay bırak) */
+        .sticky-filters {
+            position: sticky;
+            top: 64px;
+            z-index: 1020;
+        }
+
+        /* Gantt kabı – mobilde yatay kaydırılabilir */
+        .gantt-wrap {
+            position: relative;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,.06);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .gantt-host {
+            min-width: 640px;
+            padding: 12px;
+        }
+
+        .gantt-empty {
+            min-height: 240px;
+        }
+
+        .gantt-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,.65);
+            backdrop-filter: blur(2px);
+            border-radius: 1rem;
+        }
+
+        /* Erişilebilir legend */
+        .legend-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .legend-active {
+            background: #16c07f;
+            box-shadow: 0 0 8px rgba(14,242,155,.55);
+        }
+
+        /* Frappe bar renkleri ve etkileşimi kilitleme */
+        #gantt .handle, #gantt .bar-progress, #gantt .bar-progress-handle {
+            display: none !important;
+        }
+
+        #gantt .bar-wrapper .bar {
+            cursor: default;
+        }
+
+        .bar-active {
+            fill: #16c07f;
+        }
+
+        /* Popup içeriği */
+        .details-container {
+            padding: .5rem .75rem;
+        }
+
+            .details-container .title {
+                font-weight: 700;
+                margin-bottom: .25rem;
+            }
+
+            .details-container .subtitle {
+                color: #16a673;
+                font-weight: 600;
+                margin-bottom: .25rem;
+            }
+
+            .details-container .meta {
+                color: #6c757d;
+                font-size: .9rem;
+            }
+
+        /* Araç seçici yükseklik ve mobil uyum */
+        .vehicle-select select {
+            height: 216px;
+        }
+
+        @@media (max-width: 992px) {
+            .vehicle-select select {
+                height: 180px;
+            }
+
+            .sticky-filters {
+                top: 56px;
+            }
+        }
+    </style>
+}

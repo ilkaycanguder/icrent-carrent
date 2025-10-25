@@ -1,0 +1,92 @@
+﻿@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Giriş";
+}
+
+
+<div class="auth-wrap">
+    <div class="container px-3">
+        <div class="row justify-content-center">
+            <div class="col-sm-10 col-md-8 col-lg-5">
+                <div class="card auth-card">
+                    <div class="card-body p-4 p-lg-5">
+
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <a class="brand-badge text-decoration-none" asp-controller="Landing" asp-action="Index"
+                               title="Ana Sayfa" aria-label="Ana Sayfa">IC</a>
+                            <div>
+                                <h4 class="mb-0 fw-bold">ICRent’e Giriş</h4>
+                                <small class="text-muted">Araç çalışma ve kiralama süreçlerinizi yönetin</small>
+                            </div>
+                        </div>
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger mb-3">@ViewBag.Error</div>
+                        }
+
+                        <form asp-action="Login" method="post" class="mt-2">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+                                <label class="form-label">Kullanıcı Adı</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input name="userName" class="form-control" placeholder="kullaniciadiniz" autocomplete="username" required />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Şifre</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input id="pwd" type="password" name="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required />
+                                    <button class="btn btn-neon-outline" type="button" id="togglePwd" aria-label="Şifreyi göster/gizle">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="remember" />
+                                    <label class="form-check-label" for="remember">Beni hatırla</label>
+                                </div>
+                                <a href="#" class="muted-link small">Şifrenizi mi unuttunuz?</a>
+                            </div>
+
+                            <button type="submit" class="btn btn-neon w-100 btn-lg">Giriş Yap</button>
+
+                            <div class="text-center mt-3">
+                                <span class="text-muted">Hesabınız yok mu?</span>
+                                <a class="ms-1" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">© @DateTime.Now.Year ICRent</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Şifre göster/gizle
+        (function(){
+          const btn = document.getElementById('togglePwd');
+          const input = document.getElementById('pwd');
+          btn.addEventListener('click', function(){
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            this.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+          });
+        })();
+
+          
+    </script>
+}

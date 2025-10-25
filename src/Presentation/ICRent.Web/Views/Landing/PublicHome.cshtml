@@ -1,0 +1,907 @@
+﻿@{
+    Layout = "_PublicLayout";
+    ViewData["Title"] = "Ana Sayfa";
+}
+<style>
+    /* ===== Neon Yeşil Tema Dokunuşları (sayfa-özel) ===== */
+    :root {
+        --neon: #0ef29b;
+        --neon-2: #7dfcc4;
+        --neon-shadow: 0 0 6px rgba(14,242,155,.75), 0 0 18px rgba(14,242,155,.35);
+        --neon-shadow-strong: 0 0 12px rgba(14,242,155,.95), 0 0 30px rgba(14,242,155,.55);
+    }
+
+    /* ---------- HAKKIMIZDA ---------- */
+    .about-wrap {
+        max-width: 860px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+    }
+
+        .about-wrap::before {
+            content: "";
+            position: absolute;
+            inset: -10% -2% auto -2%;
+            height: 38%;
+            background: radial-gradient(60% 120% at 50% 0%, rgba(14,242,155,.14), transparent 70%);
+            filter: blur(12px);
+            z-index: -1;
+        }
+
+    .about-badge {
+        display: inline-block;
+        padding: .4rem .85rem;
+        border-radius: 999px;
+        font-weight: 700;
+        letter-spacing: .3px;
+        background: linear-gradient(90deg, rgba(14,242,155,.16), rgba(14,242,155,.06));
+        color: #0b7f55;
+        border: 1px solid rgba(14,242,155,.35);
+        box-shadow: var(--neon-shadow);
+    }
+
+    #about h2 {
+        text-shadow: 0 10px 28px rgba(0,0,0,.12);
+    }
+
+    #about .lead {
+        color: #54626a;
+    }
+
+    /* ---------- SSS / ACCORDION ---------- */
+    .faq .accordion-item {
+        border: 1px solid rgba(14,242,155,.28);
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 6px 20px rgba(14,242,155,.08);
+    }
+
+        .faq .accordion-item + .accordion-item {
+            margin-top: 1rem;
+        }
+
+    .faq .accordion-button {
+        font-weight: 700;
+        padding: 1rem 1.2rem;
+        transition: color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+        .faq .accordion-button:not(.collapsed) {
+            background: linear-gradient(180deg, rgba(14,242,155,.16), rgba(14,242,155,.08));
+            color: #0c8a5c;
+            box-shadow: inset 0 -1px 0 rgba(14,242,155,.25);
+        }
+
+        .faq .accordion-button:focus {
+            box-shadow: 0 0 0 0.2rem rgba(14,242,155,.25);
+            border-color: rgba(14,242,155,.45);
+        }
+
+    .faq .accordion-body {
+        padding: 1rem 1.2rem 1.2rem;
+        color: #5c6a72;
+    }
+
+    /* ---------- CTA (Neon kart) ---------- */
+    .cta {
+        position: relative;
+        border-radius: 18px;
+        background: radial-gradient(1200px 500px at 100% -20%, rgba(14,242,155,.12), transparent 60%), radial-gradient(900px 400px at -10% 120%, rgba(14,242,155,.10), transparent 60%), linear-gradient(180deg, #ffffff, #f9fffb);
+        border: 1px solid rgba(14,242,155,.28);
+        box-shadow: 0 18px 40px rgba(14,242,155,.12), var(--neon-shadow);
+    }
+
+        .cta::after {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(120deg, rgba(14,242,155,.55), rgba(125,252,196,.18), transparent 60%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+    .cta-title {
+        letter-spacing: .3px;
+        text-shadow: 0 8px 22px rgba(0,0,0,.10);
+    }
+
+    /* ---------- Buton Uyumları ---------- */
+    .btn.neon-btn {
+        --g1: #0ef29b;
+        --g2: #7dfcc4;
+        background: linear-gradient(90deg, var(--g1), var(--g2));
+        border: none;
+        color: #0a553a;
+        font-weight: 700;
+        box-shadow: var(--neon-shadow);
+    }
+
+        .btn.neon-btn:hover {
+            filter: brightness(.98);
+            box-shadow: var(--neon-shadow-strong);
+            transform: translateY(-1px);
+        }
+
+    .btn.neon-outline {
+        border: 1.5px solid rgba(14,242,155,.55);
+        color: #0b7f55;
+        background: linear-gradient(180deg, rgba(14,242,155,.06), rgba(14,242,155,.0));
+        font-weight: 700;
+        box-shadow: 0 6px 16px rgba(14,242,155,.10);
+    }
+
+        .btn.neon-outline:hover {
+            background: rgba(14,242,155,.14);
+            color: #095c3f;
+            transform: translateY(-1px);
+        }
+
+    /* Küçük ekran uyumu */
+    @@media (max-width: 576px) {
+        .cta .row > [class*="col-"]:last-child {
+            text-align: left !important;
+        }
+    }
+
+    /* hero aşağı ok – neonla uyumlu */
+    .down-arrow {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        color: #fff;
+        transition: .25s;
+        margin-top: .25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 0 3px rgba(14,242,155,.12);
+    }
+
+        .down-arrow:hover {
+            background: rgba(14,242,155,.14);
+            transform: translateY(2px);
+            border-color: #0ef29b;
+        }
+
+        .down-arrow .arrow {
+            display: block;
+            width: 0;
+            height: 0;
+            margin: auto;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 12px solid #fff;
+            filter: drop-shadow(0 0 6px rgba(14,242,155,.65));
+        }
+
+    /* why kartları */
+    .why-card {
+        border: 1px solid rgba(14,242,155,.18);
+        border-radius: 16px;
+        background: #fff;
+        transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+
+        .why-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 .75rem 1.5rem rgba(14,242,155,.14), 0 0 12px rgba(14,242,155,.25);
+            border-color: rgba(14,242,155,.55);
+        }
+
+    .why-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        box-shadow: inset 0 0 0 1px rgba(14,242,155,.35);
+    }
+
+    /* Smooth scroll'u JS ile yapacağız */
+    html {
+        scroll-behavior: auto;
+    }
+
+    /* Navbar yüksekliği kadar offset */
+    #why {
+        scroll-margin-top: 80px;
+    }
+
+    /* Yukarı butonu */
+    #backToTop {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 1050;
+        display: none;
+        box-shadow: 0 8px 20px rgba(14,242,155,.25);
+    }
+
+    /* küçük ekran optimizasyonu – (önceki yazımdaki @@ media hatasını düzelttim) */
+    @@media (max-width: 576px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+    }
+
+    .fleet-scope {
+        --neon: #0ef29b;
+        --neon2: #7dfcc4;
+        --ink: #212529;
+        --muted: #6c757d;
+        --edge: rgba(14,242,155,.22);
+        --card: #fff;
+        --shadow: 0 14px 30px rgba(14,242,155,.16), 0 6px 18px rgba(0,0,0,.06);
+    }
+
+        .fleet-scope .fleet-card {
+            background: var(--card);
+            border: 1px solid var(--edge);
+            border-radius: 22px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: var(--shadow);
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+        }
+
+            .fleet-scope .fleet-card .p-3,
+            .fleet-scope .fleet-card .p-lg-4 {
+                display: flex;
+                flex-direction: column;
+                flex: 1; /* içerik alanı uzasın */
+            }
+
+        .fleet-scope .divider {
+            margin-top: .75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Price/CTA satırı en alta yapışsın */
+        .fleet-scope .fleet-card .price-row,
+        .fleet-scope .fleet-card .d-flex.align-items-center.justify-content-between.mt-3 {
+            margin-top: auto; /* fiyat/cta her kartta en altta */
+        }
+            .fleet-scope .fleet-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 18px 42px rgba(14,242,155,.22), 0 8px 24px rgba(0,0,0,.08);
+                border-color: rgba(14,242,155,.45);
+            }
+
+        .fleet-scope .fleet-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 2;
+            border-radius: 999px;
+            font-weight: 700;
+            background: linear-gradient(90deg,var(--neon),var(--neon2));
+            color: #0c5132;
+            box-shadow: 0 10px 20px rgba(14,242,155,.3);
+        }
+
+        .fleet-scope .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover !important; /* contain'i ez */
+            object-position: center;
+            border-radius: 12px;
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,.16));
+        }
+
+        .fleet-scope .img-wrap {
+            position: relative;
+            background: linear-gradient(180deg,#f6fffb,#ffffff);
+        }
+
+            .fleet-scope .img-wrap .ratio {
+                --bs-aspect-ratio: 56%;
+            }
+
+                .fleet-scope .img-wrap .ratio img {
+                    filter: drop-shadow(0 8px 18px rgba(0,0,0,.18));
+                    transition: transform .35s ease;
+                }
+     
+        .fleet-scope .fleet-card:hover img {
+            transform: scale(1.03);
+        }
+
+        .fleet-scope .title {
+            font-weight: 800;
+            color: #e31b23;
+            letter-spacing: .2px;
+        }
+
+        .fleet-scope .muted {
+            color: var(--muted);
+        }
+
+        .fleet-scope .divider {
+            height: 1px;
+            background: rgba(0,0,0,.06);
+            margin: .75rem 0 1rem;
+        }
+
+        .fleet-scope .feat i {
+            width: 1.25rem;
+            display: inline-flex;
+            justify-content: center;
+        }
+
+        .fleet-scope .price {
+            font-weight: 800;
+        }
+
+        .fleet-scope .rent-link {
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+            .fleet-scope .rent-link:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<section class="hero position-relative overflow-hidden">
+    <!-- SLIDER -->
+    <div id="heroCarousel" class="carousel slide carousel-fade"
+         data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active position-relative">
+                <div class="hero-bg" style="background-image:url('/images/1.jpg'); --fx:70%; --fy:40%;"></div>
+            </div>
+            <div class="carousel-item position-relative">
+                <div class="hero-bg" style="background-image:url('/images/2.jpg'); --fx:20%; --fy:50%;"></div>
+            </div>
+            <div class="carousel-item position-relative">
+                <div class="hero-bg" style="background-image:url('/images/3.jpg'); --fx:50%; --fy:25%;"></div>
+            </div>
+        </div>
+
+        <button class="carousel-control-prev d-none d-md-flex" type="button"
+                data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Önceki">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next d-none d-md-flex" type="button"
+                data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Sonraki">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+
+        <div class="carousel-indicators d-none d-md-flex">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-label="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="3"></button>
+        </div>
+    </div>
+
+    <!-- soluklaştırma -->
+    <div class="hero-dim"></div>
+    <div class="hero-top-fade"></div>
+
+    <!-- HERO CONTENT -->
+    <div class="hero-content container text-center">
+        <h1 class="hero-title text-white fw-bold mb-3">ICRent</h1>
+        <p class="hero-subtitle text-light mb-4">
+            Araç çalışma ve kiralama süreçlerini kolay, hızlı ve güvenli biçimde yönet.
+        </p>
+
+        <!-- aşağı ok -->
+        <a href="#car" class="down-arrow" aria-label="Aşağı kaydır">
+            <span class="arrow"></span>
+        </a>
+
+        <div class="mt-5 d-flex flex-column flex-md-row justify-content-center gap-3 text-center">
+            <!-- STAT KARTLAR: sadece sınıfları zenginleştirdim -->
+            <div class="p-4 bg-white shadow-sm rounded-4 glass glow-hover ring-neon">
+                <h4 class="fw-bold text-primary mb-1">7×24</h4>
+                <p class="text-muted mb-0">Kesintisiz Takip</p>
+            </div>
+            <div class="p-4 bg-white shadow-sm rounded-4 glass glow-hover ring-neon">
+                <h4 class="fw-bold text-success mb-1">Anında Başla</h4>
+                <p class="text-muted mb-0">Kurulum gerektirmez, hemen kullan</p>
+            </div>
+            <div class="p-4 bg-white shadow-sm rounded-4 glass glow-hover ring-neon">
+                <h4 class="fw-bold text-warning mb-1">Şeffaf Fiyat</h4>
+                <p class="text-muted mb-0">Sürpriz yok, net ücretlendirme</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section id="car" class="fleet-scope py-5 py-md-6">
+    <div class="container">
+        <div class=" text-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Araçlarımız</h2>
+            </div>
+        </div>
+
+        <!-- Responsive grid -->
+        <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4">
+
+            <!-- Card 1 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/clio.png" alt="Renault Clio 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Renault Clio</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">Ekonomik, şehir içi kullanım için ideal.</div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 2 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">900 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/egea.png" alt="Fiat Egea 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Fiat Egea</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">Konforlu ve geniş aile aracı.</div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 3 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">1.000 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/focus.png" alt="Ford Focus 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Ford Focus</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">Prestijli ve uzun yol için ideal.</div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 3 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">1.000 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/corolla.png" alt="Toyota Corolla 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Toyota Corolla</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">Konforlu ve geniş aile aracı.</div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 3 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">1.100 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/camry.png" alt="Toyota Camry 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Toyota Camry</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">Prestijli ve uzun yol için ideal.</div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 3 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">1.100 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/octavia.png" alt="Skoda Octavia 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Skoda Octavia</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">Prestijli ve uzun yol için ideal.</div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 3 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">1.100 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 7 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/eseri.png" alt="Mercedes E-Serisi 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Mercedes E-Serisi</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">
+                            Özel Premium VIP araç.
+                        </div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 3 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">2.500 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 8 -->
+            <div class="col">
+                <div class="fleet-card h-100">
+                    <div class="img-wrap">
+                        <span class="fleet-badge px-3 py-1 small"><i class="bi bi-shield-check me-1"></i>Tam Kasko</span>
+                        <div class="ratio"><img src="/images/cars/tourneo.png" alt="Ford Tourneo 2024" loading="lazy"></div>
+                    </div>
+                    <div class="p-3 p-lg-4">
+                        <div class="mb-1">
+                            <a href="#" class="title h5 mb-0 d-inline-block">Ford Tourneo</a>
+                            <span class="muted ms-2">(2024 Model)</span>
+                        </div>
+                        <div class="muted">
+                            Konforlu ve geniş aile aracı.
+                        </div>
+                        <div class="divider"></div>
+
+                        <div class="row row-cols-2 g-2 small">
+                            <div class="col feat muted"><i class="bi bi-gear"></i> Otomatik</div>
+                            <div class="col feat muted"><i class="bi bi-fuel-pump"></i> Dizel</div>
+                            <div class="col feat muted"><i class="bi bi-speedometer2"></i> Düşük KM</div>
+                            <div class="col feat muted"><i class="bi bi-snow"></i> Klima Var</div>
+                            <div class="col feat muted"><i class="bi bi-people"></i> 5 Kişilik</div>
+                            <div class="col feat muted"><i class="bi bi-bag"></i> 4 Bagaj</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="muted">Günlük <span class="price">1.300 ₺</span></div>
+                            <a href="#" class="rent-link text-danger">Hemen Kirala <i class="bi bi-arrow-right-short"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="why" class="py-5 py-md-6 bg-light">
+    <div class="container">
+        <div class="text-center mb-4 mb-md-5">
+            <h2 class="fw-bold">Neden bizi tercih etmelisiniz?</h2>
+            <p class="text-muted mb-0">Operasyonunuzu kolaylaştıran, bütçenizi koruyan ve size zaman kazandıran çözüm.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card why-card h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="why-icon bg-primary-subtle text-primary mb-3"><i class="bi bi-speedometer2"></i></div>
+                        <h5 class="card-title fw-semibold">Kesintisiz Takip</h5>
+                        <p class="card-text text-muted">Araçlarınızı 7/24 izleyin; gecikmeleri ve sürprizleri daha oluşmadan yönetin.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card why-card h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="why-icon bg-success-subtle text-success mb-3"><i class="bi bi-rocket-takeoff"></i></div>
+                        <h5 class="card-title fw-semibold">Hızlı Başlangıç</h5>
+                        <p class="card-text text-muted">Dakikalar içinde kullanmaya başlayın; eğitim derdi yok, ek yük yok.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card why-card h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="why-icon bg-warning-subtle text-warning mb-3"><i class="bi bi-cash-coin"></i></div>
+                        <h5 class="card-title fw-semibold">Bütçe Dostu</h5>
+                        <p class="card-text text-muted">Gizli maliyet yok. Net fiyatlandırma ile maliyetlerinizi kontrol edin.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card why-card h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="why-icon bg-info-subtle text-info mb-3"><i class="bi bi-bar-chart-line"></i></div>
+                        <h5 class="card-title fw-semibold">Şeffaf Raporlama</h5>
+                        <p class="card-text text-muted">Gerçek zamanlı grafikler ve net özetlerle karar almak çok kolay.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card why-card h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="why-icon bg-danger-subtle text-danger mb-3"><i class="bi bi-headset"></i></div>
+                        <h5 class="card-title fw-semibold">Yanınızdayız</h5>
+                        <p class="card-text text-muted">Sorularınıza hızlı dönüş, ihtiyaçlarınıza uygun yol arkadaşlığı.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card why-card h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="why-icon bg-secondary-subtle text-secondary mb-3"><i class="bi bi-people"></i></div>
+                        <h5 class="card-title fw-semibold">Mutlu Kullanıcılar</h5>
+                        <p class="card-text text-muted">Basit arayüz, akıcı deneyim. Ekibiniz severek kullanır, süreçler hızlanır.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="py-5 py-md-6">
+    <div class="container">
+        <div class="about-wrap">
+            <span class="about-badge mb-3">Hakkımızda</span>
+            <h2 class="fw-bold mb-3">Basit. Hızlı. Şeffaf.</h2>
+            <p class="lead mx-auto mb-4">
+                ICRent; araç çalışma ve kiralama süreçlerini karmaşadan arındırmak için
+                doğdu. Kurulum yok, eğitim derdi yok—<strong>dakikalar içinde</strong> kullanmaya
+                başlarsınız. Şeffaf raporlar, net ücretlendirme ve her adımda yanınızda olan
+                destekle işinizi kolaylaştırırız. Kısacası: <em>ihtiyacınız kadar özellik, fazlası yok.</em>
+            </p>
+
+            <a asp-controller="Account" asp-action="Register" class="btn neon-btn me-2 mb-2">
+                <i class="bi bi-person-plus me-1"></i> Hemen Başla
+            </a>
+            <a href="#why" class="btn neon-outline mb-2">Neden Biz?</a>
+        </div>
+    </div>
+</section>
+
+
+
+
+<section id="faq" class="faq py-5 py-md-6 bg-light">
+    <div class="container">
+        <div class="text-center mb-4 mb-md-5">
+            <h2 class="fw-bold">Sık Sorulan Sorular</h2>
+            <p class="text-muted mb-0">Aklınızdaki sorulara hızlı yanıtlar.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="accordion" id="faqAcc">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="q1h">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                                Kurulum gerekiyor mu?
+                            </button>
+                        </h2>
+                        <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                            <div class="accordion-body">
+                                Hayır. ICRent, tarayıcı üzerinden hemen kullanıma hazırdır. Sadece giriş yapın ve başlayın.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="q2h">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                                Fiyatlandırma nasıl?
+                            </button>
+                        </h2>
+                        <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                            <div class="accordion-body">
+                                Şeffaf ve sade. İhtiyacınız kadar ödersiniz; gizli maliyet yok.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="q3h">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
+                                Destek süreci nasıl işliyor?
+                            </button>
+                        </h2>
+                        <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+                            <div class="accordion-body">
+                                Ürün içinden bize ulaşın; ekibimiz hızlı dönüş yapar ve ihtiyacınıza uygun çözümler sunar.
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /accordion -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="cta p-4 p-md-5">
+            <div class="row align-items-center g-3">
+                <div class="col-lg-8">
+                    <h3 class="cta-title fw-bold mb-2">Filonuza hız katın.</h3>
+                    <p class="mb-0">Dakikalar içinde başlayın; takip, raporlama ve şeffaf fiyat tek yerde.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a asp-controller="Account" asp-action="Register" class="btn neon-btn me-2 mb-2">
+                        <i class="bi bi-person-plus me-1"></i> Ücretsiz Başlayın
+                    </a>
+                    <a href="#about" class="btn neon-outline mb-2">Hakkımızda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<button id="backToTop" class="btn btn-primary rounded-circle" aria-label="Yukarı">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+@section Scripts {
+    <script>
+        (function(){
+          const header = document.querySelector('.navbar.fixed-top');
+          const headerH = header ? header.offsetHeight : 0;
+          const backBtn = document.getElementById('backToTop');
+
+          function smoothTo(targetY, duration=900){
+            const startY = window.pageYOffset, diff = targetY - startY; let t0=null;
+            const ease = x => x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,2)/2; // yumuşak hız eğrisi
+            function step(ts){
+              if(!t0) t0 = ts;
+              const p = Math.min((ts - t0)/duration, 1);
+              window.scrollTo(0, startY + diff * ease(p));
+              if(p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+          }
+
+          // aşağı ok (#why)
+          document.querySelectorAll('a[href="#why"]').forEach(a=>{
+            a.addEventListener('click', e=>{
+              e.preventDefault();
+              const el = document.getElementById('why');
+              const y = el.getBoundingClientRect().top + window.pageYOffset - headerH - 12;
+              smoothTo(y, 900);
+            });
+          });
+
+          // yukarı butonu
+          window.addEventListener('scroll', ()=> { backBtn.style.display = (window.pageYOffset > 300) ? 'inline-flex' : 'none'; });
+          backBtn.addEventListener('click', ()=> smoothTo(0, 900));
+        })();
+    </script>
+}

@@ -1,0 +1,440 @@
+﻿/* Poppins zaten layout'ta import edildi */
+:root {
+    --ic-primary: #0d6efd;
+    --ic-secondary: #198754;
+    --ic-text: #212529;
+    --ic-bg: #f8f9fa;
+    --nav-h: 88px; /* navbar yüksekliği */
+    --hero-h: calc(100vh - var(--nav-h));
+    --neon: #0ef29b;
+    --neon-2: #7dfcc4;
+    --neon-shadow: 0 0 6px rgba(14,242,155,.75), 0 0 18px rgba(14,242,155,.35);
+    --neon-shadow-strong: 0 0 10px rgba(14,242,155,.9), 0 0 30px rgba(14,242,155,.6);
+    --hero-h: 100vh;
+    --nav-h: 0px;
+
+}
+.public-nav {
+    background: #fff;
+    border-bottom: 1px solid rgba(14,242,155,.18);
+    box-shadow: 0 4px 12px rgba(0,0,0,.04);
+    padding: 14px 0; /* kontrollü yükseklik */
+}
+.neon-brand {
+    color: var(--neon);
+    text-shadow: var(--neon-shadow);
+}
+
+.public-nav .navbar-brand {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: .3px;
+    line-height: 1.2; /* yükseklik şişmesini engeller */
+}
+
+.public-nav .nav-link {
+    padding: .5rem .85rem;
+    line-height: 1.2; /* satır boyu sabit */
+}
+
+/* Genel */
+body {
+    font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--ic-text);
+    background: var(--ic-bg);
+}
+
+/* Navbar ufak dokunuş */
+.navbar .navbar-brand {
+    letter-spacing: .3px;
+    font-weight: 700;
+}
+
+.navbar .btn.btn-primary {
+    background-image: linear-gradient(90deg, var(--ic-primary), var(--ic-secondary));
+    border: none;
+}
+
+.navbar .nav-link {
+    position: relative;
+    transition: color .2s ease, transform .2s ease, text-shadow .2s ease;
+    font-size: 1rem;
+    padding: .6rem .9rem;
+}
+    .navbar .nav-link::after {
+        content: "";
+        position: absolute;
+        left: 12%;
+        right: 12%;
+        bottom: 6px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--neon), transparent);
+        transform: translateY(4px) scaleX(.5);
+        opacity: 0;
+        transition: transform .2s ease, opacity .2s ease;
+        border-radius: 2px;
+    }
+
+    .navbar .nav-link:hover {
+        color: var(--neon) !important;
+        transform: translateY(-1px);
+        text-shadow: var(--neon-shadow);
+    }
+
+        .navbar .nav-link:hover::after {
+            opacity: 1;
+            transform: translateY(0) scaleX(1);
+        }
+
+/* Navbar brand’a hafif neon */
+.navbar .navbar-brand {
+    color: var(--neon);
+    text-shadow: var(--neon-shadow);
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: .4px;
+}
+
+/* Footer */
+footer {
+    margin-top: 4rem;
+    background: #fff;
+    color: #6c757d;
+    text-align: center;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(0,0,0,.06);
+}
+
+/* HERO SLIDER (navbarın yüksekliğine göre tam ekran) */
+.hero {
+    position: relative;
+    min-height: var(--hero-h);
+    overflow: hidden;
+}
+    .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(60% 120% at 10% 0%, rgba(14,242,155,.10), transparent 60%), radial-gradient(60% 120% at 90% 0%, rgba(14,242,155,.08), transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .hero,
+    .hero .carousel,
+    .hero .carousel-inner,
+    .hero .carousel-item {
+        height: 100vh !important;
+        min-height: 520px; /* istersen alt limit */
+    }
+
+
+.carousel, .carousel-inner {
+    height: var(--hero-h);
+}
+
+.carousel-item {
+    height: var(--hero-h);
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* sıkışma yok, gerekirse kırp */
+    object-position: var(--fx,50%) var(--fy,50%); /* odak */
+    display: block;
+    filter: brightness(.78);
+}
+
+.hero-dim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.45));
+    z-index: 1;
+    pointer-events: none;
+}
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover; /* sıkışma yok */
+    background-repeat: no-repeat;
+    background-position: var(--fx,50%) var(--fy,50%); /* odak */
+    filter: brightness(.78);
+    pointer-events: none;
+}
+.hero-content {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    pointer-events: auto;
+}
+
+.hero-title {
+    font-size: clamp(3rem,8vw,6rem);
+    letter-spacing: .5px;
+    text-shadow: 0 6px 20px rgba(0,0,0,.28);
+}
+
+.hero-subtitle {
+    font-size: clamp(1rem,2.2vw,1.6rem);
+    max-width: 980px;
+    color: #e9ecef;
+}
+
+/* Form dokunuşları */
+.hero .form-control {
+    border-radius: .9rem;
+}
+
+.hero .btn-primary {
+    background-image: linear-gradient(90deg, var(--ic-primary), var(--ic-secondary));
+    border: none;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    filter: drop-shadow(0 0 8px rgba(14,242,155,.6));
+}
+
+.carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 0;
+    background: linear-gradient(90deg, #0ef29b, #7dfcc4);
+    opacity: .45;
+    box-shadow: 0 0 10px rgba(14,242,155,.35);
+}
+
+.carousel-indicators .active {
+    opacity: .95;
+}
+
+/* Okları yalnızca masaüstünde göster (isteğe bağlı) */
+.carousel-control-prev, .carousel-control-next {
+    opacity: 0;
+    transition: opacity .2s;
+    z-index: 5;
+}
+
+.hero:hover .carousel-control-prev,
+.hero:hover .carousel-control-next {
+    opacity: .9;
+}
+
+@media (min-width: 768px) {
+    .carousel-control-prev, .carousel-control-next {
+        display: flex;
+    }
+}
+
+/* Motion erişilebilirliği */
+@media (prefers-reduced-motion: reduce) {
+    .carousel, .carousel-item {
+        transition: none !important;
+    }
+}
+
+
+    .hero::before {
+        /* yumuşak bir gradient arka plan */
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(1200px 600px at 50% -10%, rgba(13,110,253,.12), transparent 60%), radial-gradient(800px 400px at 100% 0%, rgba(25,135,84,.10), transparent 55%);
+        z-index: -1;
+    }
+
+.hero-title {
+    font-size: clamp(3rem, 7vw, 5rem); /* büyük başlık */
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: .5px;
+    margin-bottom: .75rem;
+}
+
+.hero-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    color: #495057;
+    max-width: 720px;
+}
+
+/* Stats kartları */
+.stat-card {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: clamp(1.25rem, 3.5vw, 2rem);
+    font-weight: 700;
+    color: var(--ic-primary);
+}
+
+.stat-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Features */
+.features {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.feature-card {
+    background: #fff;
+    border-radius: 1rem;
+}
+
+.feature-emoji {
+    font-size: 1.75rem;
+    line-height: 1;
+    margin-bottom: .5rem;
+}
+
+.feature-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: .25rem;
+}
+
+/* Butonlar */
+.btn-primary {
+    background-image: linear-gradient(90deg, var(--ic-primary), var(--ic-secondary));
+    border: none;
+    box-shadow: var(--neon-shadow);
+}
+
+    .btn-primary:hover {
+        filter: brightness(.96);
+        box-shadow: var(--neon-shadow-strong);
+    }
+
+.btn-outline-primary {
+    border-width: 2px;
+}
+
+/* Küçük ekran uyumu */
+@media (max-width: 576px) {
+    :root {
+        --nav-h: 80px;
+    }
+
+    .navbar.fixed-top {
+        padding: 10px 0;
+    }
+
+    .navbar .nav-link {
+        padding: .5rem .75rem;
+    }
+}
+/* Footer mini dokunuşlar: isterseniz publiclayout.css'e taşıyın */
+.footer-link {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+
+
+.footer-title {
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: .2px;
+}
+
+/* Why kartları – neon sınır ve ikon plakası */
+.why-card {
+    border: 1px solid rgba(14,242,155,.18);
+}
+
+    .why-card:hover {
+        border-color: rgba(14,242,155,.55);
+        box-shadow: 0 .75rem 1.5rem rgba(14,242,155,.14), var(--neon-shadow);
+    }
+
+.why-icon {
+    box-shadow: inset 0 0 0 1px rgba(14,242,155,.35), var(--neon-shadow);
+}
+
+/* Footer linklerine hafif neon */
+.footer-link:hover {
+    color: var(--neon) !important;
+    text-decoration: none;
+    text-shadow: var(--neon-shadow);
+}
+
+.footer-border {
+    border-top: 1px solid rgba(0,0,0,.08);
+}
+
+.footer-brand {
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+.footer-social a {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.down-arrow {
+    border-color: rgba(255,255,255,.65);
+    box-shadow: 0 0 0 3px rgba(14,242,155,.18), var(--neon-shadow);
+}
+
+    .down-arrow:hover {
+        background: rgba(14,242,155,.14);
+        border-color: var(--neon);
+        box-shadow: 0 0 0 4px rgba(14,242,155,.28), var(--neon-shadow-strong);
+    }
+
+/* Cam efekti (hero’daki mini istatistik kutuları için) */
+.glass {
+    background: rgba(255,255,255,.82) !important;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(14,242,155,.25);
+}
+
+.ring-neon {
+    position: relative;
+}
+
+    .ring-neon::after {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: 1rem;
+        background: linear-gradient(120deg, rgba(14,242,155,.45), rgba(125,252,196,.15), transparent 60%);
+        z-index: -1;
+        filter: blur(14px);
+        opacity: .55;
+    }
+
+.glow-hover {
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+    .glow-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 28px rgba(14,242,155,.18), var(--neon-shadow);
+        border-color: rgba(14,242,155,.55);
+    }
+/* mevcut hero-dim üzerine ekstra bir üst geçiş ekleyeceğiz */
+.hero-top-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 260px; /* yüksekliği istersen 220–320px arası oynat */
+    pointer-events: none;
+    z-index: 1; /* hero-dim'in üstünde, yazıların altında */
+    background: linear-gradient( to bottom, rgba(0,0,0,.62) 0%, rgba(0,0,0,.45) 18%, rgba(0,0,0,.25) 40%, rgba(0,0,0,.10) 62%, rgba(0,0,0,0) 100% );
+}

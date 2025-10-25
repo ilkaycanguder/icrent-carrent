@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ICRent</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --neon: #0ef29b;
+            --neon-2: #7dfcc4;
+            --neon-shadow: 0 0 6px rgba(14,242,155,.75), 0 0 18px rgba(14,242,155,.35);
+            --neon-shadow-strong: 0 0 10px rgba(14,242,155,.9), 0 0 30px rgba(14,242,155,.6);
+        }
+
+        /* sayfadan çıkışta yumuşak fade */
+        body {
+            opacity: 1;
+            transition: opacity .25s ease;
+        }
+
+            body.fade-out {
+                opacity: 0;
+            }
+
+            /* Arka plan: neon yeşil ışımalı */
+            body.bg-neon {
+                min-height: 100vh;
+                background: radial-gradient(1200px 600px at 80% -20%, rgba(14,242,155,.22), transparent 60%), radial-gradient(900px 500px at -10% 120%, rgba(14,242,155,.18), transparent 60%), #f7fbf9;
+            }
+
+        /* Kart: cam benzeri + neon kenar */
+        .auth-card {
+            border: 1px solid rgba(14,242,155,.25);
+            border-radius: 20px;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 12px 30px rgba(14,242,155,.12), 0 8px 24px rgba(0,0,0,.06);
+            position: relative;
+        }
+
+            .auth-card::after {
+                content: "";
+                position: absolute;
+                inset: -2px;
+                border-radius: 22px;
+                background: linear-gradient(120deg, rgba(14,242,155,.45), rgba(125,252,196,.15), transparent 60%);
+                filter: blur(16px);
+                z-index: -1;
+                opacity: .55;
+            }
+
+        /* Logo rozeti */
+        .brand-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--neon), var(--neon-2));
+            color: #05341f;
+            font-weight: 800;
+            box-shadow: var(--neon-shadow);
+        }
+
+        /* Başlık ve küçük neon ayırıcı çizgi */
+        .auth-title {
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .neon-line {
+            height: 3px;
+            width: 120px;
+            margin: .25rem auto 0;
+            border-radius: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon), transparent);
+            box-shadow: var(--neon-shadow);
+            animation: glowPulse 2.4s ease-in-out infinite;
+        }
+        @@keyframes glowPulse {
+            0%,100%
+
+        {
+            filter: drop-shadow(0 0 4px rgba(14,242,155,.6));
+            opacity: .85;
+        }
+
+        50% {
+            filter: drop-shadow(0 0 12px rgba(14,242,155,.95));
+            opacity: 1;
+        }
+
+        }
+
+        /* Form elemanları */
+        .form-control {
+            border-radius: .9rem;
+            border: 1px solid rgba(14,242,155,.25);
+            background-color: #fff;
+        }
+
+            .form-control:focus {
+                border-color: rgba(14,242,155,.75);
+                box-shadow: 0 0 0 .25rem rgba(14,242,155,.20);
+            }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 .25rem rgba(14,242,155,.20);
+            border-color: rgba(14,242,155,.75);
+        }
+
+        .form-check-input:checked {
+            background: linear-gradient(180deg, var(--neon), var(--neon-2));
+            border-color: transparent;
+        }
+
+        /* Butonlar */
+        .btn-neon {
+            --btn-bg: linear-gradient(90deg, var(--neon), var(--neon-2));
+            background: var(--btn-bg);
+            color: #05341f;
+            font-weight: 700;
+            letter-spacing: .2px;
+            border: 1px solid rgba(14,242,155,.65);
+            box-shadow: var(--neon-shadow);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+            .btn-neon:hover {
+                transform: translateY(-1px);
+                box-shadow: var(--neon-shadow-strong);
+                color: #032317;
+            }
+
+        .btn-neon-outline {
+            border: 1px solid rgba(14,242,155,.55);
+            color: #0b3b27;
+            background: #fff;
+        }
+
+            .btn-neon-outline:hover {
+                color: #032317;
+                box-shadow: var(--neon-shadow);
+                border-color: rgba(14,242,155,.9);
+            }
+
+        /* Linkler */
+        .muted-link {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color .2s ease, text-shadow .2s ease;
+        }
+
+            .muted-link:hover {
+                color: var(--neon);
+                text-shadow: var(--neon-shadow);
+                text-decoration: none;
+            }
+
+        /* Küçük detaylar */
+        .divider-text {
+            position: relative;
+            text-align: center;
+            color: #6c757d;
+            font-size: .9rem;
+        }
+
+            .divider-text::before, .divider-text::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                width: 38%;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(14,242,155,.35), transparent);
+            }
+
+            .divider-text::before {
+                left: 0;
+            }
+
+            .divider-text::after {
+                right: 0;
+            }
+
+        /* reduce-motion */
+        @@media (prefers-reduced-motion: reduce) {
+            .neon-line
+
+        {
+            animation: none;
+        }
+
+        body {
+            transition: none;
+        }
+
+        }
+    </style>
+</head>
+
+<body class="bg-neon d-flex align-items-center">
+    <!--
+      İçerikte kullanman için öneri:
+      <div class="card auth-card p-4 p-md-5">
+         <div class="d-flex align-items-center gap-2 mb-3">
+           <div class="brand-badge"><i class="bi bi-lightning-charge-fill"></i></div>
+           <div class="ms-1 fw-bold">ICRent</div>
+         </div>
+         <h4 class="auth-title mb-1">Giriş Yap</h4>
+         <div class="neon-line"></div>
+         ...
+         <button class="btn btn-neon w-100 mt-3">Devam</button>
+      </div>
+    -->
+    <main class="container">@RenderBody()</main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function(){
+          // Link ve form geçişlerinde yumuşak çıkış
+          document.addEventListener('click', function (e) {
+            const a = e.target.closest('a');
+            if (!a) return;
+            if (a.target === '_blank' || (a.getAttribute('href')||'').startsWith('#') ||
+                a.origin !== location.origin || a.classList.contains('no-transition')) return;
+            e.preventDefault();
+            document.body.classList.add('fade-out');
+            setTimeout(()=>location.href=a.href, 200);
+          }, true);
+
+          document.addEventListener('submit', function (e) {
+            const f = e.target;
+            if (f.classList.contains('no-transition')) return;
+            e.preventDefault();
+            document.body.classList.add('fade-out');
+            setTimeout(()=>f.submit(), 200);
+          }, true);
+        })();
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

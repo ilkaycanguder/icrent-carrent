@@ -1,0 +1,92 @@
+﻿@model List<WorkLog>
+@{
+    var vehicles = (IEnumerable<Vehicle>)ViewBag.Vehicles ?? Enumerable.Empty<Vehicle>();
+    int currentVehicleId = ViewBag.VehicleId is int vid ? vid : 0;
+    string startStr = ViewBag.StartString as string ?? "";
+    string endStr = ViewBag.EndString as string ?? "";
+    bool hasSelection = currentVehicleId > 0 && !string.IsNullOrEmpty(startStr) && !string.IsNullOrEmpty(endStr);
+}
+
+<link href="~/css/neonbtn.css" rel="stylesheet" />
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Araç</label>
+                <select name="vehicleId" class="form-select" required>
+                    @* "Seçiniz" satırı *@
+                    @if (currentVehicleId == 0)
+                    {
+                        <option value="" disabled selected>Seçiniz</option>
+                    }
+                    else
+                    {
+                        <option value="" disabled>Seçiniz</option>
+                    }
+
+                    @* Araçlar *@
+                    @foreach (var v in vehicles)
+                    {
+                        if (v.Id == currentVehicleId)
+                        {
+                            <option value="@v.Id" selected>@v.Name (@v.Plate)</option>
+                        }
+                        else
+                        {
+                            <option value="@v.Id">@v.Name (@v.Plate)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Başlangıç</label>
+                <input type="date" name="start" class="form-control" value="@startStr" required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Bitiş</label>
+                <input type="date" name="end" class="form-control" value="@endStr" required />
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-neon">Listele</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (hasSelection && Model != null && Model.Any())
+{
+    <div class="card">
+        <div class="card-body table-responsive">
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Aktif (saat)</th>
+                        <th>Bakım (saat)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td>@r.WorkDate.ToString("dd.MM.yyyy")</td>
+                            <td>@r.ActiveHours</td>
+                            <td>@r.MaintenanceHours</td>
+                            <td class="text-end">
+                                <a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@r.Id">Düzenle</a>
+                                <form asp-action="Delete" asp-route-id="@r.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Silinsin mi?')">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Araç Ekle";
+}
+<html>
+
+<h4 class="mt-4 mb-3">Araç Ekle</h4>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<link href="~/css/neonbtn.css" rel="stylesheet" />
+
+<form asp-action="Create" method="post" class="col-md-5">
+    <div class="mb-3">
+        <label class="form-label">Ad</label>
+        <input name="name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Plaka</label>
+        <input name="plate" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-neon">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Geri</a>
+</form>
+</html>

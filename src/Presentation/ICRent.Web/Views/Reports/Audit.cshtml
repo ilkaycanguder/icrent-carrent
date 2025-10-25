@@ -1,0 +1,192 @@
+﻿@model PagedResult<AuditViewModel>
+
+@{
+    ViewData["Title"] = "Audit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var pageSizes = new[] { 10, 20, 50, 100 };
+
+}
+<style>
+    :root {
+        --neon: #0ef29b;
+        --neon-2: #7dfcc4;
+        --neon-dark: #0b7f55;
+        --neon-border: rgba(14,242,155,.35);
+        --neon-hover: rgba(14,242,155,.08);
+        --neon-shadow: 0 0 6px rgba(14,242,155,.6), 0 0 18px rgba(14,242,155,.28);
+    }
+
+    /* Kapsam */
+    .audit-scope .card-like {
+        background: #fff;
+        border: 1px solid var(--neon-border);
+        border-radius: 16px;
+        box-shadow: 0 14px 28px rgba(14,242,155,.10),0 6px 14px rgba(0,0,0,.05);
+        overflow: visible;
+    }
+
+    /* Tablo başlık */
+    .audit-scope table thead th {
+        background: linear-gradient(180deg, rgba(14,242,155,.18), rgba(14,242,155,.08));
+        color: var(--neon-dark);
+        border: 0 !important;
+        font-weight: 800;
+        letter-spacing: .2px;
+        padding: 14px 18px;
+    }
+
+    /* Satırlar */
+    .audit-scope table tbody td {
+        padding: 14px 18px;
+        border-top: 1px solid rgba(0,0,0,.04);
+        vertical-align: middle;
+    }
+
+    .audit-scope .table-striped > tbody > tr:nth-of-type(odd) {
+        background: #ffffff;
+    }
+
+    .audit-scope .table-striped > tbody > tr:nth-of-type(even) {
+        background: #fbfffd;
+    }
+
+    .audit-scope table tbody tr:hover {
+        background: var(--neon-hover);
+    }
+
+    /* badge gibi ufak vurgu (İşlem/Varlık hücreleri için hafif ton) */
+    .audit-scope td:first-child {
+        font-weight: 700;
+        color: #0a6e49;
+    }
+
+    /* Pagination – neon yeşil */
+    .audit-scope .pagination .page-link {
+        border: 1px solid var(--neon-border);
+        color: var(--neon-dark);
+        box-shadow: none;
+    }
+
+        .audit-scope .pagination .page-link:hover {
+            background: var(--neon-hover);
+            color: var(--neon-dark);
+        }
+
+    .audit-scope .pagination .page-item.active .page-link {
+        background: linear-gradient(90deg, var(--neon), var(--neon-2));
+        border-color: transparent;
+        color: #0b2f20;
+        font-weight: 800;
+        text-shadow: var(--neon-shadow);
+    }
+
+    .audit-scope .pagination .page-item.disabled .page-link {
+        opacity: .55;
+        background: #f9fafb;
+    }
+
+    .audit-scope .table-responsive {
+        overflow-x: auto; /* garanti */
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0 0 16px 16px; /* köşeler yine yumuşak */
+    }
+
+    /* Sayfa boyutu seçimi */
+    .audit-scope .form-select-sm {
+        border: 1px solid var(--neon-border);
+        box-shadow: none;
+    }
+
+        .audit-scope .form-select-sm:focus {
+            border-color: var(--neon);
+            box-shadow: 0 0 0 .2rem rgba(14,242,155,.2);
+        }
+
+    /* Masaüstünde tabla kenarlarını yumuşat */
+    @@media (min-width: 576px) {
+        .audit-scope .table-responsive {
+            border-radius: 0 0 16px 16px;
+        }
+    }
+    @@media (max-width: 576px) {
+        .audit-scope .table
+
+    {
+        min-width: 720px; /* ihtiyaca göre 640–900 arasında oynatabilirsin */
+    }
+
+    }
+    </style>
+
+
+<div class="audit-scope">
+    <div class="table-responsive card-like">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>İşlem</th>
+                    <th>Varlık</th>
+                    <th>Id</th>
+                    <th>Detay</th>
+                    <th>Tarih</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Islem</td>
+                        <td>@item.Varlik</td>
+                        <td>@item.EntityLabel</td>
+                        <td>@item.Detay</td>
+                        <td>@item.Tarih</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-3">
+        <ul class="pagination justify-content-end mb-0">
+            <li class="page-item @(Model.HasPrev ? "" : "disabled")">
+                <a class="page-link"
+                   href="@Url.Action("Audit", new { page = Model.Page - 1, pageSize = Model.PageSize })">Önceki</a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Audit", new { page = i, pageSize = Model.PageSize })">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                <a class="page-link"
+                   href="@Url.Action("Audit", new { page = Model.Page + 1, pageSize = Model.PageSize })">Sonraki</a>
+            </li>
+        </ul>
+    </nav>
+}
+
+<form method="get" class="mt-2 d-flex gap-2 align-items-center">
+    <input type="hidden" name="page" value="1" />
+    <label class="text-muted small mb-0">Sayfa boyutu:</label>
+    <select name="pageSize" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+        @foreach (var s in pageSizes)
+        {
+            if (s == Model.PageSize)
+            {
+                <option value="@s" selected>@s</option>
+            }
+            else
+            {
+                <option value="@s">@s</option>
+            }
+        }
+    </select>
+</form>
+

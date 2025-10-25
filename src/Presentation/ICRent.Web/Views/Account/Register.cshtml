@@ -1,0 +1,118 @@
+﻿@model RegisterViewModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Kayıt Ol";
+    var firstError = ViewData.ModelState?
+    .Values.SelectMany(v => v.Errors)
+    .Select(e => e.ErrorMessage)
+    .FirstOrDefault();
+}
+
+<div class="auth-wrap">
+    <div class="container px-3">
+        <div class="row justify-content-center">
+            <div class="col-sm-10 col-md-8 col-lg-5">
+                <div class="card auth-card">
+                    <div class="card-body p-4 p-lg-5">
+
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <a class="brand-badge text-decoration-none" asp-controller="Landing" asp-action="Index"
+                               title="Ana Sayfa" aria-label="Ana Sayfa">IC</a>
+                            <div>
+                                <h4 class="mb-0 fw-bold">Yeni Hesap Oluştur</h4>
+                                <small class="text-muted">Dakikalar içinde sisteme katılın</small>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(firstError))
+                        {
+                            <div class="alert alert-danger mb-3">@firstError</div>
+                        }
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger mb-3">@ViewBag.Error</div>
+                        }
+                  
+                        @if (ViewBag.RegisterSuccess == true)
+                        {
+                            <div id="regSuccess"
+                                 class="alert alert-success mb-3"
+                                 style="transition:opacity .4s ease; opacity:1">
+                                @((string)ViewBag.SuccessText ?? "Kayıt başarılı! Giriş yapabilirsiniz.")
+                            </div>
+                        }
+
+                        <form asp-action="Register" method="post" class="mt-2">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+                                <label class="form-label" asp-for="UserName">Kullanıcı Adı</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input asp-for="UserName" class="form-control" placeholder="kullaniciadiniz" autocomplete="username" required />
+
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" asp-for="Password">Şifre</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input id="pwd" type="password" asp-for="Password" class="form-control" placeholder="••••••••" autocomplete="new-password" required />
+                                    <button class="btn btn-neon-outline" type="button" id="togglePwd" aria-label="Şifreyi göster/gizle">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <button type="submit" class="btn btn-neon w-100 btn-lg">Kayıt Ol</button>
+
+                            <div class="text-center mt-3">
+                                <span class="text-muted">Zaten hesabınız var mı?</span>
+                                <a class="ms-1" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">© @DateTime.Now.Year ICRent</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+            (function () {
+          const box = document.getElementById('regSuccess');
+          if (!box) return;
+
+          // 2 sn bekle, sonra mesajı söndür ve ardından Login'e git
+          setTimeout(() => {
+            box.style.opacity = '0';
+            setTimeout(() => {
+              window.location.href = '@Url.Action("Login", "Account")';
+            }, 400); // fade süresi (opacity transition ile uyumlu)
+          }, 2000);
+        })();
+
+        // Şifre göster/gizle
+        (function(){
+          const btn = document.getElementById('togglePwd');
+          const input = document.getElementById('pwd');
+          btn.addEventListener('click', function(){
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            this.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+          });
+        })();
+
+
+    </script>
+}
